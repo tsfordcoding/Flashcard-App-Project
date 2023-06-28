@@ -1,14 +1,29 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
+import { createDeck } from "../utils/api";
 
 function CreateDeck() {
   const history = useHistory();
-  const initialState = {
+  const initialFormState = {
     name: "",
     description: "",
   };
 
-  const [newDeck, setNewDeck] = useState(initialState);
+  const [formData, setFormData] = useState(initialFormState);
+
+  const handleChange = ({ target }) => {
+    setFormData({
+      ...formData,
+      [target.name]: target.value,
+    });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const abortController = new AbortController();
+    const response = await createDeck({...formData}, abortController.signal);
+    history.push(`/decks/${response.id}`);
+  };
 
   const handleCancel = () => {
     history.push("/");
@@ -19,7 +34,7 @@ function CreateDeck() {
       <div className="container">
         <nav>
           <ul className="breadcrumb p-3 bg-body-tertiary rounded-3">
-            <li className="breadcrumb-item ">
+            <li className="breadcrumb-item">
               <Link to="/">
                 <span className="oi oi-home mr-2" />
                 Home
@@ -32,28 +47,34 @@ function CreateDeck() {
         <div>
           <h1>Create Deck</h1>
 
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label for="name" className="form-label">
+              <label htmlFor="name" className="form-group">
                 Name
               </label>
               <input
+                name="name"
                 type="text"
                 className="form-control"
                 id="name"
                 placeholder="Deck Name"
+                onChange={handleChange}
+                value={formData.name}
               />
             </div>
 
             <div className="mb-3">
-              <label for="description" className="form-label">
+              <label htmlFor="description" className="form-label">
                 Description
               </label>
               <textarea
+                name="description"
                 className="form-control"
                 id="description"
                 placeholder="Brief description of the deck"
                 rows="4"
+                onChange={handleChange}
+                value={formData.description}
               ></textarea>
             </div>
             <div className="mb-3">

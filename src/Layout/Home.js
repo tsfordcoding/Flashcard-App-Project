@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { listDecks, deleteDeck } from "../utils/api/index";
 
@@ -12,7 +12,7 @@ function Home() {
       try {
         const deckResponse = await listDecks(abortController.signal);
         setDecks(deckResponse);
-      } catch(error) {
+      } catch (error) {
         console.log("Something went wrong", error);
       }
       return () => {
@@ -21,18 +21,14 @@ function Home() {
     }
     fetchData();
   }, []);
-  
+
   async function handleDelete(deck) {
-    if(
-        window.confirm(
-            `Delete this deck? You will not be able to recover it.`
-        )
-    ) {
+    if (window.confirm(`Delete this deck? You will not be able to recover it.`)) {
+        await deleteDeck(deck.id);
         history.go(0);
-        return await deleteDeck(deck.id)
     }
   }
-  
+
   return (
     <>
       <div className="container">
@@ -41,10 +37,10 @@ function Home() {
         </Link>
         <br />
         <br />
-        <div className="card-deck">
+        <div className="card">
           {decks.map((deck) => {
             return (
-              <div className="card" key={deck.id}>
+              <div className="card-body" key={deck.id}>
                 <div className="card-header mb-2">
                   <p className="float-right ml-3">{`${deck.cards.length} cards`}</p>
                   <h2 className="card-title pb-2 my-0">{`${deck.name}`}</h2>
